@@ -20,20 +20,38 @@ except:
 
 gtk.gdk.threads_init()
 
+
+class GtkGladeHelper:
+    def __init__(self):
+        pass
+
+    __glade_file = "main.glade"
+
+    @staticmethod
+    def get_glade_window(name):
+        return gtk.glade.XML(GtkGladeHelper.__glade_file, name)
+
+    @staticmethod
+    def get_window_control(window, control_name):
+        return window.get_widget(control_name)
+
+
 class SerialHelper:
     def __init__(self):
-        self.__available_ports = list(serial.tools.list_ports.comports())
+        pass
 
-    @property
-    def available_ports(self):
-        return self.__available_ports
+    __available_ports = list(serial.tools.list_ports.comports())
 
-    @property
-    def available_ports_names(self):
-        return map(lambda port: port[0], self.__available_ports)
+    @staticmethod
+    def get_available_ports():
+        return SerialHelper.__available_ports
 
-    @property
-    def available_baud_rates(self):
+    @staticmethod
+    def get_available_ports_names():
+        return map(lambda port: port[0], SerialHelper.__available_ports)
+
+    @staticmethod
+    def get_available_baud_rates():
         return ["300",
                 "1200",
                 "2400",
@@ -77,32 +95,68 @@ class GeneratorTask(object):
         self._stopped = True
 
 
+class PortInfoWindow:
+    def __init__(self):
+        self.__portsInfoWindow = GtkGladeHelper.get_glade_window("dlgPortsInfo")
+        self.__dlg = GtkGladeHelper.get_window_control(self.__portsInfoWindow, "dlgPortsInfo")
+        self.__tree_view = GtkGladeHelper.get_window_control(self.__portsInfoWindow, "trPorts")
+
+        self.__add_column("Port", 0)
+        self.__add_column("Device", 1)
+        self.__add_column("PID", 2)
+
+        self.port_list = None
+        self.__fill_tree_view()
+
+    def __fill_tree_view(self):
+        ports = SerialHelper.get_available_ports()
+        self.port_list = gtk.ListStore(str, str, str)
+
+        for port in ports:
+            self.port_list.append([port[0], port[1], port[2]])
+
+        self.__tree_view.set_model(self.port_list)
+
+    def __add_column(self, title, column_id):
+        column = gtk.TreeViewColumn(title, gtk.CellRendererText(), text=column_id)
+        column.set_resizable(True)
+        column.set_sort_column_id(column_id)
+        self.__tree_view.append_column(column)
+
+    def run(self):
+        self.__dlg.run()
+        self.__dlg.destroy()
+
+
 class MainWindow:
     def __init__(self):
-        self.__glade_file = "main.glade"
-        self.__mainWindow = gtk.glade.XML(self.__glade_file, "mainWindow")
-        self.__SerialHelper = SerialHelper()
+        self.__mainWindow = GtkGladeHelper.get_glade_window("mainWindow")
 
-        self.__cbo_ports = self.__mainWindow.get_widget("cboPorts")
-        self.__cbo_baud_rates = self.__mainWindow.get_widget("cboBaudrates")
-        self.__btn_connect = self.__mainWindow.get_widget("btnConnect")
-        self.__txt_data = self.__mainWindow.get_widget("txtData")
+        self.__cbo_ports = GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
+        self.__cbo_baud_rates = GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
+        self.__btn_connect = GtkGladeHelper.get_window_control(self.__mainWindow, "btnConnect")
+        self.__txt_data = GtkGladeHelper.get_window_control(self.__mainWindow, "txtData")
         self.__txt_data.set_editable(True)
 
         self.__fill_ports_combobox()
         self.__fill_baud_rates_combobox()
 
         self.__signals = {"on_mainWindow_destroy": self.__destroy,
-                          "on_btnConnect_toggled": self.__read_data}
+                          "on_btnConnect_toggled": self.__read_data,
+                          "on_mnuPortsInfo_activate": self.__port_info_actvate}
         self.__mainWindow.signal_autoconnect(self.__signals)
 
         self.__Serial = None
         self.__refresh_text_view_task = None
         self.__is_connected = False
 
+    def __port_info_actvate(self, widget):
+        ports_info_wnd = PortInfoWindow()
+        ports_info_wnd.run()
+
     def __fill_ports_combobox(self):
         store = gtk.ListStore(str)
-        ports_names = self.__SerialHelper.available_ports_names
+        ports_names = SerialHelper.get_available_ports_names()
 
         for port in ports_names:
             store.append([port])
@@ -115,7 +169,7 @@ class MainWindow:
 
     def __fill_baud_rates_combobox(self):
         store = gtk.ListStore(str)
-        baud_rates = self.__SerialHelper.available_baud_rates
+        baud_rates = SerialHelper.get_available_baud_rates()
 
         for baud_rate in baud_rates:
             store.append([baud_rate])
@@ -167,7 +221,7 @@ class MainWindow:
 
 if __name__ == "__main__":
 
-    if 0 == len(SerialHelper().available_ports):
+    if 0 == SerialHelper.get_available_ports():
         md = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, "There is no available serial ports")
         md.run()
         md.destroy()
