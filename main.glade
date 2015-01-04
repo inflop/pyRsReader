@@ -5,6 +5,7 @@
   <widget class="GtkAboutDialog" id="dlgAbout">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="modal">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">pyRsReader</property>
     <property name="version">0.0.1</property>
@@ -35,6 +36,7 @@
   <widget class="GtkDialog" id="dlgPortsInfo">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="modal">True</property>
     <property name="type_hint">dialog</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox2">
@@ -200,7 +202,7 @@
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">True</property>
+            <property name="fill">False</property>
             <property name="position">1</property>
           </packing>
         </child>

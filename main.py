@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+__author__ = "Rafał Klepacz"
+__copyright__ = "Copyright 2015, The Inflop Project"
+__credits__ = ["Rafał Klepacz"]
+__license__ = "GPL"
+__version__ = "0.0.1"
+__maintainer__ = "Rafał Klepacz"
+__email__ = "infloper@gmail.com"
+__status__ = "BETA"
 
 import sys
 import threading
@@ -21,6 +31,8 @@ except:
 
 gtk.gdk.threads_init()
 
+APP_NAME = "pyRsReader"
+
 
 class GtkGladeHelper:
     def __init__(self):
@@ -28,9 +40,9 @@ class GtkGladeHelper:
 
     __glade_file = "main.glade"
 
-    @staticmethod
-    def get_glade_window(name):
-        return gtk.glade.XML(GtkGladeHelper.__glade_file, name)
+    @classmethod
+    def get_glade_window(cls, name):
+        return gtk.glade.XML(cls.__glade_file, name)
 
     @staticmethod
     def get_window_control(window, control_name):
@@ -39,6 +51,7 @@ class GtkGladeHelper:
     @staticmethod
     def show_error_msg(msg):
         dlg = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
+        dlg.set_title(APP_NAME)
         dlg.run()
         dlg.destroy()
         gtk.main_quit()
@@ -104,14 +117,17 @@ class GeneratorTask(object):
 
 
 class PortInfoWindow:
-    def __init__(self):
+    def __init__(self, parent_window):
         self.__portsInfoWindow = GtkGladeHelper.get_glade_window("dlgPortsInfo")
         self.__dlg = GtkGladeHelper.get_window_control(self.__portsInfoWindow, "dlgPortsInfo")
         self.__tree_view = GtkGladeHelper.get_window_control(self.__portsInfoWindow, "trPorts")
+        self.__dlg.set_transient_for(parent_window)
+        self.__dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.__dlg.set_title(APP_NAME)
 
-        self.__add_column("Port", 0)
-        self.__add_column("Device", 1)
-        self.__add_column("PID", 2)
+        self.__add_column("Port name", 0)
+        self.__add_column("Description", 1)
+        self.__add_column("VID:PID", 2)
 
         self.port_list = None
         self.__fill_tree_view()
@@ -136,9 +152,24 @@ class PortInfoWindow:
         self.__dlg.destroy()
 
 
+class AboutDlg:
+    def __init__(self, parent_window):
+        self.__dlgAbout = GtkGladeHelper.get_glade_window("dlgAbout")
+        self.__dlg = GtkGladeHelper.get_window_control(self.__dlgAbout, "dlgAbout")
+        self.__dlg.set_transient_for(parent_window)
+        self.__dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.__dlg.set_title(APP_NAME)
+
+    def run(self):
+        self.__dlg.run()
+        self.__dlg.destroy()
+
+
 class MainWindow:
     def __init__(self):
         self.__mainWindow = GtkGladeHelper.get_glade_window("mainWindow")
+        self.__mainWindowWidget = GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
+        self.__mainWindowWidget.set_title(APP_NAME)
 
         self.__cbo_ports = GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
         self.__cbo_baud_rates = GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
@@ -151,16 +182,21 @@ class MainWindow:
 
         self.__signals = {"on_mainWindow_destroy": self.__destroy,
                           "on_btnConnect_toggled": self.__read_data,
-                          "on_mnuPortsInfo_activate": self.__port_info_actvate}
+                          "on_mnuPortsInfo_activate": self.__port_info_activate,
+                          "on_menuAbout_activate": self.__about_dlg_activate}
         self.__mainWindow.signal_autoconnect(self.__signals)
 
         self.__Serial = None
         self.__refresh_text_view_task = None
         self.__is_connected = False
 
-    def __port_info_actvate(self, widget):
-        ports_info_wnd = PortInfoWindow()
+    def __port_info_activate(self, widget):
+        ports_info_wnd = PortInfoWindow(self.__mainWindowWidget)
         ports_info_wnd.run()
+
+    def __about_dlg_activate(self, widget):
+        about_dlg = AboutDlg(self.__mainWindowWidget)
+        about_dlg.run()
 
     def __fill_ports_combobox(self):
         store = gtk.ListStore(str)
@@ -188,11 +224,14 @@ class MainWindow:
         self.__cbo_baud_rates.pack_start(cell, True)
         self.__cbo_baud_rates.add_attribute(cell, 'text', 0)
 
-    def __refresh_connect_button_state(self):
+    def __refresh_connect_controls_state(self):
         if self.__is_connected:
             self.__btn_connect.set_label("Disconnect")
         else:
             self.__btn_connect.set_label("Connect")
+
+        self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
+        self.__cbo_ports.set_sensitive(not self.__is_connected)
 
     def __read_data(self, widget):
         if not self.__is_connected:
@@ -212,7 +251,7 @@ class MainWindow:
             self.__Serial.close()
             self.__is_connected = False
 
-        self.__refresh_connect_button_state()
+        self.__refresh_connect_controls_state()
 
     def __append(self, *args):
         self.__txt_data.get_buffer().insert(self.__txt_data.get_buffer().get_end_iter(), *args)
