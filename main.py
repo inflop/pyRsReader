@@ -85,6 +85,10 @@ class SerialHelper:
                 "57600",
                 "115200"]
 
+    @classmethod
+    def refresh(cls):
+        cls.__available_ports = list(serial.tools.list_ports.comports())
+
 
 class GeneratorTask(object):
     def __init__(self, generator, loop_callback, complete_callback=None):
@@ -182,7 +186,8 @@ class MainWindow:
 
         self.__signals = {"on_mainWindow_destroy": self.__destroy,
                           "on_btnConnect_toggled": self.__read_data,
-                          "on_mnuPortsInfo_activate": self.__port_info_activate,
+                          "on_mnuPortsDetails_activate": self.__port_info_activate,
+                          "on_mnuRefresh_activate": self.__refresh_ports,
                           "on_menuAbout_activate": self.__about_dlg_activate}
         self.__mainWindow.signal_autoconnect(self.__signals)
 
@@ -194,11 +199,17 @@ class MainWindow:
         ports_info_wnd = PortInfoWindow(self.__mainWindowWidget)
         ports_info_wnd.run()
 
+    def __refresh_ports(self, widget):
+        SerialHelper.refresh()
+        self.__fill_ports_combobox()
+
     def __about_dlg_activate(self, widget):
         about_dlg = AboutDlg(self.__mainWindowWidget)
         about_dlg.run()
 
     def __fill_ports_combobox(self):
+        self.__cbo_ports.set_model(None)
+        self.__cbo_ports.clear()
         store = gtk.ListStore(str)
         ports_names = SerialHelper.get_available_ports_names()
 
@@ -230,6 +241,7 @@ class MainWindow:
         else:
             self.__btn_connect.set_label("Connect")
 
+        GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(not self.__is_connected)
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
         self.__cbo_ports.set_sensitive(not self.__is_connected)
 

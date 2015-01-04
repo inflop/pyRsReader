@@ -110,6 +110,30 @@
                 <property name="label" translatable="yes">_Ports</property>
                 <property name="use_underline">True</property>
                 <signal name="activate" handler="on_mnuPortsInfo_activate" swapped="no"/>
+                <child>
+                  <widget class="GtkMenu" id="menu1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <widget class="GtkMenuItem" id="mnuPortsDetails">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Details</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_mnuPortsDetails_activate" swapped="no"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="mnuPortsRefresh">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Refresh</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_mnuRefresh_activate" swapped="no"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
               </widget>
             </child>
             <child>
