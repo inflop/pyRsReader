@@ -4,6 +4,7 @@ import sys
 import threading
 import gobject
 import thread
+import logging
 
 try:
     import pygtk
@@ -41,6 +42,7 @@ class GtkGladeHelper:
         dlg.run()
         dlg.destroy()
         gtk.main_quit()
+
 
 class SerialHelper:
     def __init__(self):
@@ -226,11 +228,10 @@ class MainWindow:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
-    if 0 == SerialHelper.get_available_ports():
-        md = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, "There is no available serial ports")
-        md.run()
-        md.destroy()
+    if len(SerialHelper.get_available_ports()) == 0:
+        GtkGladeHelper.show_error_msg("There is no available serial ports")
         gtk.main_quit()
 
     mainWindow = MainWindow()
