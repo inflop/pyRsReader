@@ -71,6 +71,7 @@
           <widget class="GtkTreeView" id="trPorts">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="enable_tree_lines">True</property>
           </widget>
           <packing>
             <property name="expand">True</property>

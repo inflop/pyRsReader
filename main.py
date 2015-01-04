@@ -35,6 +35,12 @@ class GtkGladeHelper:
     def get_window_control(window, control_name):
         return window.get_widget(control_name)
 
+    @staticmethod
+    def show_error_msg(msg):
+        dlg = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
+        dlg.run()
+        dlg.destroy()
+        gtk.main_quit()
 
 class SerialHelper:
     def __init__(self):
@@ -42,13 +48,13 @@ class SerialHelper:
 
     __available_ports = list(serial.tools.list_ports.comports())
 
-    @staticmethod
-    def get_available_ports():
-        return SerialHelper.__available_ports
+    @classmethod
+    def get_available_ports(cls):
+        return cls.__available_ports
 
-    @staticmethod
-    def get_available_ports_names():
-        return map(lambda port: port[0], SerialHelper.__available_ports)
+    @classmethod
+    def get_available_ports_names(cls):
+        return map(lambda port: port[0], cls.__available_ports)
 
     @staticmethod
     def get_available_baud_rates():
