@@ -219,6 +219,7 @@ class MainWindow:
     def __refresh_ports(self, widget):
         SerialHelper.refresh()
         self.__fill_ports_combobox()
+        self.__refresh_connect_controls_state()
 
     def __about_dlg_activate(self, widget):
         about_dlg = AboutDlg(self.__mainWindowWidget)
@@ -265,9 +266,11 @@ class MainWindow:
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
         self.__cbo_ports.set_sensitive(not self.__is_connected)
 
+        self.__combobox_changed()
+
     def __combobox_changed(self):
-        is_port_selected = len(self.__cbo_ports.get_active_text()) > 0
-        is_baudrate_selected = len(self.__cbo_baud_rates.get_active_text()) > 0
+        is_port_selected = self.__cbo_ports.get_active_text() is not None and len(self.__cbo_ports.get_active_text()) > 0
+        is_baudrate_selected = self.__cbo_baud_rates.get_active_text() is not None and len(self.__cbo_baud_rates.get_active_text()) > 0
         enable_btn_connect = is_port_selected and is_baudrate_selected
 
         self.__btn_connect.set_sensitive(enable_btn_connect)
@@ -292,8 +295,14 @@ class MainWindow:
                 return
 
             def gen():
-                while self.__Serial.readable():
-                    yield self.__Serial.readline()
+                try:
+                    while self.__Serial.readable():
+                        yield self.__Serial.readline()
+                except serial.SerialException:
+                    yield "Selected device can not be found or can not be configured.\n"
+                    self.__btn_connect.toggled()
+                    self.__is_connected = False
+                    self.__refresh_connect_controls_state()
 
             self.__refresh_text_view_task = GeneratorTask(gen, self.__append)
             self.__refresh_text_view_task.start()
