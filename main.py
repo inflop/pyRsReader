@@ -203,6 +203,7 @@ class MainWindow:
                           "on_mnuRefresh_activate": self.__refresh_ports,
                           "on_menuAbout_activate": self.__about_dlg_activate}
         self.__mainWindow.signal_autoconnect(self.__signals)
+        self.__mainWindowWidget.connect("delete-event", self.__on_close, None)
 
         self.__Serial = None
         self.__refresh_text_view_task = None
@@ -289,6 +290,20 @@ class MainWindow:
             self.__Serial.close()
 
         gtk.main_quit()
+
+    def __on_close(self, widget, event, data):
+        result = False
+
+        if self.__is_connected:
+            response = GtkGladeHelper.show_question_msg("Connection is established. Are you sure you want to quit?")
+
+            if response == gtk.RESPONSE_YES:
+                gtk.main_quit()
+                result = False
+            else:
+                result = True
+
+        return result
 
 
 if __name__ == "__main__":
