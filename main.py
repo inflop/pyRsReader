@@ -18,7 +18,6 @@ import logging
 
 try:
     import pygtk
-    pygtk.require("2.0")
 except:
     pass
 try:
@@ -51,10 +50,24 @@ class GtkGladeHelper:
     @staticmethod
     def show_error_msg(msg):
         dlg = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
+        dlg.set_position(gtk.WIN_POS_CENTER_ALWAYS)
         dlg.set_title(APP_NAME)
         dlg.run()
         dlg.destroy()
-        gtk.main_quit()
+
+    @staticmethod
+    def show_question_msg(question):
+        dlg = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, question)
+        dlg.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        dlg.set_title(APP_NAME)
+
+        result = dlg.run()
+        dlg.destroy()
+        return result
+
+    @staticmethod
+    def show_info_msg():
+        pass
 
 
 class SerialHelper:
