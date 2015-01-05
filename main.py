@@ -294,7 +294,8 @@ class MainWindow:
                 self.__is_connected = True
             except serial.SerialException:
                 GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.")
-                self.__btn_connect.set_inconsistent(True)
+                self.__btn_connect.set_active(False)
+                self.__refresh_ports()
                 return
 
             def gen():
@@ -303,7 +304,7 @@ class MainWindow:
                         yield self.__Serial.readline()
                 except serial.SerialException:
                     yield "Selected device can not be found or can not be configured.\n"
-                    self.__btn_connect.toggled()
+                    self.__btn_connect.set_active(False)
                     self.__is_connected = False
                     self.__refresh_ports()
 
