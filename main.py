@@ -191,6 +191,7 @@ class MainWindow:
         self.__cbo_ports = GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
         self.__cbo_baud_rates = GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
         self.__btn_connect = GtkGladeHelper.get_window_control(self.__mainWindow, "btnConnect")
+        self.__btn_connect.set_sensitive(False)
         self.__txt_data = GtkGladeHelper.get_window_control(self.__mainWindow, "txtData")
         self.__txt_data.set_editable(True)
 
@@ -201,7 +202,9 @@ class MainWindow:
                           "on_btnConnect_toggled": self.__read_data,
                           "on_mnuPortsDetails_activate": self.__port_info_activate,
                           "on_mnuRefresh_activate": self.__refresh_ports,
-                          "on_menuAbout_activate": self.__about_dlg_activate}
+                          "on_menuAbout_activate": self.__about_dlg_activate,
+                          "on_cboPorts_changed": self.__on_cboPorts_changed,
+                          "on_cboBaudrates_changed": self.__on_cboBaudrates_changed}
         self.__mainWindow.signal_autoconnect(self.__signals)
         self.__mainWindowWidget.connect("delete-event", self.__on_close, None)
 
@@ -262,12 +265,31 @@ class MainWindow:
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
         self.__cbo_ports.set_sensitive(not self.__is_connected)
 
+    def __combobox_changed(self):
+        is_port_selected = len(self.__cbo_ports.get_active_text()) > 0
+        is_baudrate_selected = len(self.__cbo_baud_rates.get_active_text()) > 0
+        enable_btn_connect = is_port_selected and is_baudrate_selected
+
+        self.__btn_connect.set_sensitive(enable_btn_connect)
+
+    def __on_cboPorts_changed(self, widget):
+        self.__combobox_changed()
+
+    def __on_cboBaudrates_changed(self, widget):
+        self.__combobox_changed()
+
     def __read_data(self, widget):
         if not self.__is_connected:
             selected_port = self.__cbo_ports.get_active_text()
             baud_rate = int(self.__cbo_baud_rates.get_active_text())
-            self.__Serial = serial.Serial(selected_port, baud_rate)
-            self.__is_connected = True
+
+            try:
+                self.__Serial = serial.Serial(selected_port, baud_rate)
+                self.__is_connected = True
+            except serial.SerialException:
+                GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.")
+                self.__btn_connect.set_inconsistent(True)
+                return
 
             def gen():
                 while self.__Serial.readable():
