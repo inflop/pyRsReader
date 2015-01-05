@@ -201,7 +201,7 @@ class MainWindow:
         self.__signals = {"on_mainWindow_destroy": self.__destroy,
                           "on_btnConnect_toggled": self.__read_data,
                           "on_mnuPortsDetails_activate": self.__port_info_activate,
-                          "on_mnuRefresh_activate": self.__refresh_ports,
+                          "on_mnuRefresh_activate": self.on_mnuRefresh_activate,
                           "on_menuAbout_activate": self.__about_dlg_activate,
                           "on_cboPorts_changed": self.__on_cboPorts_changed,
                           "on_cboBaudrates_changed": self.__on_cboBaudrates_changed}
@@ -216,7 +216,10 @@ class MainWindow:
         ports_info_wnd = PortInfoWindow(self.__mainWindowWidget)
         ports_info_wnd.run()
 
-    def __refresh_ports(self, widget):
+    def on_mnuRefresh_activate(self, widget):
+        self.__refresh_ports()
+
+    def __refresh_ports(self):
         SerialHelper.refresh()
         self.__fill_ports_combobox()
         self.__refresh_connect_controls_state()
@@ -302,7 +305,7 @@ class MainWindow:
                     yield "Selected device can not be found or can not be configured.\n"
                     self.__btn_connect.toggled()
                     self.__is_connected = False
-                    self.__refresh_connect_controls_state()
+                    self.__refresh_ports()
 
             self.__refresh_text_view_task = GeneratorTask(gen, self.__append)
             self.__refresh_text_view_task.start()
