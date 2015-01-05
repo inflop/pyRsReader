@@ -236,6 +236,9 @@ class MainWindow:
         self.__cbo_ports.pack_start(cell, True)
         self.__cbo_ports.add_attribute(cell, 'text', 0)
 
+        if len(ports_names) == 1:
+            self.__cbo_ports.set_active(0)
+
     def __fill_baud_rates_combobox(self):
         store = gtk.ListStore(str)
         baud_rates = SerialHelper.get_available_baud_rates()
