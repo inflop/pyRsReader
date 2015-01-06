@@ -188,12 +188,16 @@ class MainWindow:
         self.__mainWindowWidget = GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
         self.__mainWindowWidget.set_title(APP_NAME)
 
+        self.__swScrollWindow = GtkGladeHelper.get_window_control(self.__mainWindow, "swScrollWindow")
+
         self.__cbo_ports = GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
         self.__cbo_baud_rates = GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
         self.__btn_connect = GtkGladeHelper.get_window_control(self.__mainWindow, "btnConnect")
         self.__btn_connect.set_sensitive(False)
         self.__txt_data = GtkGladeHelper.get_window_control(self.__mainWindow, "txtData")
         self.__txt_data.set_editable(True)
+        self.__txt_data.connect("size-allocate", self.__autoscroll)
+        self.__chkScroll = GtkGladeHelper.get_window_control(self.__mainWindow, "chkScroll")
 
         self.__fill_ports_combobox()
         self.__fill_baud_rates_combobox()
@@ -287,6 +291,13 @@ class MainWindow:
 
     def __on_btnClear_clicked(self, widget):
         GeneratorTask(lambda: " ", self.__clear).start()
+
+    def __autoscroll(self, *args):
+        autoscroll_checked = self.__chkScroll.get_active()
+
+        if autoscroll_checked:
+            adj = self.__swScrollWindow.get_vadjustment()
+            adj.set_value(adj.get_upper() - adj.get_page_size())
 
     def __read_data(self, widget):
         if not self.__is_connected:

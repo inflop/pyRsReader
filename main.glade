@@ -214,12 +214,28 @@
               </packing>
             </child>
             <child>
+              <widget class="GtkCheckButton" id="chkScroll">
+                <property name="label" translatable="yes">Autoscroll</property>
+                <property name="width_request">100</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="draw_indicator">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
               <widget class="GtkToggleButton" id="btnConnect">
-                <property name="label" translatable="yes">Connect</property>
+                <property name="label">gtk-connect</property>
                 <property name="width_request">100</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
                 <signal name="toggled" handler="on_btnConnect_toggled" swapped="no"/>
               </widget>
               <packing>
@@ -254,7 +270,7 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkScrolledWindow" id="scrolledwindow1">
+          <widget class="GtkScrolledWindow" id="swScrollWindow">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">automatic</property>
