@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = "Rafał Klepacz"
+__author__ = "infloper"
 __copyright__ = "Copyright 2015, The Inflop Project"
-__credits__ = ["Rafał Klepacz"]
+__credits__ = ["infloper"]
 __license__ = "GPL"
 __version__ = "0.0.1"
-__maintainer__ = "Rafał Klepacz"
+__maintainer__ = "infloper"
 __email__ = "infloper@gmail.com"
 __status__ = "BETA"
 
