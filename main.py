@@ -204,7 +204,8 @@ class MainWindow:
                           "on_mnuRefresh_activate": self.on_mnuRefresh_activate,
                           "on_menuAbout_activate": self.__about_dlg_activate,
                           "on_cboPorts_changed": self.__on_cboPorts_changed,
-                          "on_cboBaudrates_changed": self.__on_cboBaudrates_changed}
+                          "on_cboBaudrates_changed": self.__on_cboBaudrates_changed,
+                          "on_btnClear_clicked": self.__on_btnClear_clicked}
         self.__mainWindow.signal_autoconnect(self.__signals)
         self.__mainWindowWidget.connect("delete-event", self.__on_close, None)
 
@@ -284,6 +285,9 @@ class MainWindow:
     def __on_cboBaudrates_changed(self, widget):
         self.__combobox_changed()
 
+    def __on_btnClear_clicked(self, widget):
+        GeneratorTask(lambda: " ", self.__clear).start()
+
     def __read_data(self, widget):
         if not self.__is_connected:
             selected_port = self.__cbo_ports.get_active_text()
@@ -322,6 +326,9 @@ class MainWindow:
             self.__txt_data.get_buffer().insert(self.__txt_data.get_buffer().get_end_iter(), *args)
         except:
             pass
+
+    def __clear(self, *args):
+        self.__txt_data.get_buffer().set_text("")
 
     def __destroy(self, widget):
         if self.__refresh_text_view_task is not None:
