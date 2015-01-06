@@ -318,7 +318,10 @@ class MainWindow:
         self.__refresh_connect_controls_state()
 
     def __append(self, *args):
-        self.__txt_data.get_buffer().insert(self.__txt_data.get_buffer().get_end_iter(), *args)
+        try:
+            self.__txt_data.get_buffer().insert(self.__txt_data.get_buffer().get_end_iter(), *args)
+        except:
+            pass
 
     def __destroy(self, widget):
         if self.__refresh_text_view_task is not None:
@@ -348,8 +351,8 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
     if len(SerialHelper.get_available_ports()) == 0:
-        GtkGladeHelper.show_error_msg("There is no available serial ports")
-        gtk.main_quit()
+        GtkGladeHelper.show_error_msg("There are no available serial ports")
+        sys.exit()
 
     mainWindow = MainWindow()
     gtk.main()
