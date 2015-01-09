@@ -13,7 +13,7 @@ setup(
     version='0.0.1',
     url='https://github.com/inflop/pyRsReader',
     license='GPL',
-    author='Rafal Klepacz',
+    author='infloper',
     author_email='infloper@gmail.com',
     description='Simple RS232 reader written in Python using pySerial and PyGTK library',
     data_files=[("", glob.glob("main.glade")), os.path.join(gtk_base_path, '..', 'runtime', 'bin', 'gdk-pixbuf-query-loaders.exe'), os.path.join(gtk_base_path, '..', 'runtime', 'bin', 'libxml2-2.dll')],
