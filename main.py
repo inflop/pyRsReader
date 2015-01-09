@@ -198,8 +198,8 @@ class MainWindow:
         self.__txt_data.set_editable(True)
         self.__txt_data.connect("size-allocate", self.__autoscroll)
         self.__chkScroll = GtkGladeHelper.get_window_control(self.__mainWindow, "chkScroll")
+        self.__sbStatus = GtkGladeHelper.get_window_control(self.__mainWindow, "sbStatus")
 
-        self.__fill_ports_combobox()
         self.__fill_baud_rates_combobox()
 
         self.__signals = {"on_mainWindow_destroy": self.__destroy,
@@ -216,6 +216,8 @@ class MainWindow:
         self.__Serial = None
         self.__refresh_text_view_task = None
         self.__is_connected = False
+
+        self.__refresh_ports()
 
     def __port_info_activate(self, widget):
         ports_info_wnd = PortInfoWindow(self.__mainWindowWidget)
@@ -267,8 +269,10 @@ class MainWindow:
     def __refresh_connect_controls_state(self):
         if self.__is_connected:
             self.__btn_connect.set_label("Disconnect")
+            self.__sbStatus.push(0, self.__cbo_ports.get_active_text() + " - Connected")
         else:
             self.__btn_connect.set_label("Connect")
+            self.__sbStatus.push(0, "Disconnected")
 
         GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(not self.__is_connected)
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
