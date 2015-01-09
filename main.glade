@@ -37,6 +37,8 @@
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="modal">True</property>
+    <property name="default_width">450</property>
+    <property name="default_height">150</property>
     <property name="type_hint">dialog</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox2">
@@ -70,10 +72,18 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkTreeView" id="trPorts">
+          <widget class="GtkScrolledWindow" id="scrolledwindow1">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="enable_tree_lines">True</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <child>
+              <widget class="GtkTreeView" id="trPorts">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="enable_tree_lines">True</property>
+              </widget>
+            </child>
           </widget>
           <packing>
             <property name="expand">True</property>
