@@ -15,6 +15,7 @@ import threading
 import gobject
 import thread
 import logging
+import gtk_helper
 
 try:
     import pygtk
@@ -31,43 +32,6 @@ except:
 gtk.gdk.threads_init()
 
 APP_NAME = "pyRsReader"
-
-
-class GtkGladeHelper:
-    def __init__(self):
-        pass
-
-    __glade_file = "main.glade"
-
-    @classmethod
-    def get_glade_window(cls, name):
-        return gtk.glade.XML(cls.__glade_file, name)
-
-    @staticmethod
-    def get_window_control(window, control_name):
-        return window.get_widget(control_name)
-
-    @staticmethod
-    def show_error_msg(msg):
-        dlg = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
-        dlg.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        dlg.set_title(APP_NAME)
-        dlg.run()
-        dlg.destroy()
-
-    @staticmethod
-    def show_question_msg(question):
-        dlg = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, question)
-        dlg.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        dlg.set_title(APP_NAME)
-
-        result = dlg.run()
-        dlg.destroy()
-        return result
-
-    @staticmethod
-    def show_info_msg():
-        pass
 
 
 class SerialHelper:
@@ -135,9 +99,9 @@ class GeneratorTask(object):
 
 class PortInfoWindow:
     def __init__(self, parent_window):
-        self.__portsInfoWindow = GtkGladeHelper.get_glade_window("dlgPortsInfo")
-        self.__dlg = GtkGladeHelper.get_window_control(self.__portsInfoWindow, "dlgPortsInfo")
-        self.__tree_view = GtkGladeHelper.get_window_control(self.__portsInfoWindow, "trPorts")
+        self.__portsInfoWindow = gtk_helper.GtkGladeHelper.get_glade_window("dlgPortsInfo")
+        self.__dlg = gtk_helper.GtkGladeHelper.get_window_control(self.__portsInfoWindow, "dlgPortsInfo")
+        self.__tree_view = gtk_helper.GtkGladeHelper.get_window_control(self.__portsInfoWindow, "trPorts")
         self.__dlg.set_transient_for(parent_window)
         self.__dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.__dlg.set_title(APP_NAME)
@@ -171,8 +135,8 @@ class PortInfoWindow:
 
 class AboutDlg:
     def __init__(self, parent_window):
-        self.__dlgAbout = GtkGladeHelper.get_glade_window("dlgAbout")
-        self.__dlg = GtkGladeHelper.get_window_control(self.__dlgAbout, "dlgAbout")
+        self.__dlgAbout = gtk_helper.GtkGladeHelper.get_glade_window("dlgAbout")
+        self.__dlg = gtk_helper.GtkGladeHelper.get_window_control(self.__dlgAbout, "dlgAbout")
         self.__dlg.set_transient_for(parent_window)
         self.__dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.__dlg.set_title(APP_NAME)
@@ -184,31 +148,31 @@ class AboutDlg:
 
 class MainWindow:
     def __init__(self):
-        self.__mainWindow = GtkGladeHelper.get_glade_window("mainWindow")
-        self.__mainWindowWidget = GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
+        self.__mainWindow = gtk_helper.GtkGladeHelper.get_glade_window("mainWindow")
+        self.__mainWindowWidget = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
         self.__mainWindowWidget.set_title(APP_NAME)
 
-        self.__swScrollWindow = GtkGladeHelper.get_window_control(self.__mainWindow, "swScrollWindow")
+        self.__swScrollWindow = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "swScrollWindow")
 
-        self.__cbo_ports = GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
-        self.__cbo_baud_rates = GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
-        self.__btn_connect = GtkGladeHelper.get_window_control(self.__mainWindow, "btnConnect")
+        self.__cbo_ports = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
+        self.__cbo_baud_rates = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
+        self.__btn_connect = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "btnConnect")
         self.__btn_connect.set_sensitive(False)
-        self.__txt_data = GtkGladeHelper.get_window_control(self.__mainWindow, "txtData")
+        self.__txt_data = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "txtData")
         self.__txt_data.set_editable(True)
         self.__txt_data.connect("size-allocate", self.__autoscroll)
-        self.__chkScroll = GtkGladeHelper.get_window_control(self.__mainWindow, "chkScroll")
-        self.__sbStatus = GtkGladeHelper.get_window_control(self.__mainWindow, "sbStatus")
+        self.__chkScroll = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "chkScroll")
+        self.__sbStatus = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "sbStatus")
 
         self.__fill_baud_rates_combobox()
 
         self.__signals = {"on_mainWindow_destroy": self.__destroy,
                           "on_btnConnect_toggled": self.__read_data,
                           "on_mnuPortsDetails_activate": self.__port_info_activate,
-                          "on_mnuRefresh_activate": self.on_mnuRefresh_activate,
+                          "on_mnuRefresh_activate": self.on_mnu_refresh_activate,
                           "on_menuAbout_activate": self.__about_dlg_activate,
-                          "on_cboPorts_changed": self.__on_cboPorts_changed,
-                          "on_cboBaudrates_changed": self.__on_cboBaudrates_changed,
+                          "on_cboPorts_changed": self.__on_cbo_ports_changed,
+                          "on_cboBaudrates_changed": self.__on_cbo_baudrates_changed,
                           "on_btnClear_clicked": self.__on_btnClear_clicked}
         self.__mainWindow.signal_autoconnect(self.__signals)
         self.__mainWindowWidget.connect("delete-event", self.__on_close, None)
@@ -223,7 +187,7 @@ class MainWindow:
         ports_info_wnd = PortInfoWindow(self.__mainWindowWidget)
         ports_info_wnd.run()
 
-    def on_mnuRefresh_activate(self, widget):
+    def on_mnu_refresh_activate(self, widget):
         self.__refresh_ports()
 
     def __refresh_ports(self):
@@ -274,7 +238,7 @@ class MainWindow:
             self.__btn_connect.set_label("Connect")
             self.__sbStatus.push(0, "Disconnected")
 
-        GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(not self.__is_connected)
+        gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(not self.__is_connected)
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
         self.__cbo_ports.set_sensitive(not self.__is_connected)
 
@@ -287,10 +251,10 @@ class MainWindow:
 
         self.__btn_connect.set_sensitive(enable_btn_connect)
 
-    def __on_cboPorts_changed(self, widget):
+    def __on_cbo_ports_changed(self, widget):
         self.__combobox_changed()
 
-    def __on_cboBaudrates_changed(self, widget):
+    def __on_cbo_baudrates_changed(self, widget):
         self.__combobox_changed()
 
     def __on_btnClear_clicked(self, widget):
@@ -312,7 +276,7 @@ class MainWindow:
                 self.__Serial = serial.Serial(selected_port, baud_rate)
                 self.__is_connected = True
             except serial.SerialException:
-                GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.")
+                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.")
                 self.__btn_connect.set_active(False)
                 self.__refresh_ports()
                 return
@@ -358,7 +322,7 @@ class MainWindow:
         result = False
 
         if self.__is_connected:
-            response = GtkGladeHelper.show_question_msg("Connection is established. Are you sure you want to quit?")
+            response = gtk_helper.GtkGladeHelper.show_question_msg("Connection is established. Are you sure you want to quit?")
 
             if response == gtk.RESPONSE_YES:
                 gtk.main_quit()
@@ -373,7 +337,7 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
     if len(SerialHelper.get_available_ports()) == 0:
-        GtkGladeHelper.show_error_msg("There are no available serial ports")
+        gtk_helper.GtkGladeHelper.show_error_msg("There are no available serial ports")
         sys.exit()
 
     mainWindow = MainWindow()
