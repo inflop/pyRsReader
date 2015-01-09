@@ -6,7 +6,7 @@ import gtk
 import serial
 import gtk_helper
 import serial_helper
-import generator_tak
+import generator_task
 import ports_info_window
 import about_window
 from main import APP_NAME
@@ -124,7 +124,7 @@ class MainWindow:
         self.__combobox_changed()
 
     def __on_btnClear_clicked(self, widget):
-        generator_tak.GeneratorTask(lambda: " ", self.__clear).start()
+        generator_task.GeneratorTask(lambda: " ", self.__clear).start()
 
     def __autoscroll(self, *args):
         autoscroll_checked = self.__chkScroll.get_active()
@@ -157,7 +157,7 @@ class MainWindow:
                     self.__is_connected = False
                     self.__refresh_ports()
 
-            self.__refresh_text_view_task = generator_tak.GeneratorTask(gen, self.__append)
+            self.__refresh_text_view_task = generator_task.GeneratorTask(gen, self.__append)
             self.__refresh_text_view_task.start()
         else:
             self.__refresh_text_view_task.stop()
