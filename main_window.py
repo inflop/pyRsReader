@@ -168,7 +168,7 @@ class MainWindow:
                 self.__is_connected = True
             except serial.SerialException:
                 gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.",
-                                                         self.__mainWindow)
+                                                         self.__mainWindowWidget)
                 self.__btn_connect.set_active(False)
                 self.__refresh_ports()
                 return
