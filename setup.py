@@ -31,8 +31,8 @@ if platform.system() == 'Windows':
             "ports_info_window.py",
             "about_window.py"
             ],
-        windows=[{"script": "main.py"}],
-        requires=['pygtk']
+        windows=[{"script": "main.py", "dest_base": "pyRsReader"}],
+        requires=["pygtk"]
     )
 else:
     setup(
