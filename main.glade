@@ -103,7 +103,7 @@
     <property name="window_position">center-always</property>
     <property name="default_width">700</property>
     <property name="default_height">400</property>
-    <signal name="destroy" handler="on_mainWindow_destroy" swapped="no"/>
+    <signal name="destroy" handler="on_mainWindow_destroy" />
     <child>
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -119,7 +119,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">_Ports</property>
                 <property name="use_underline">True</property>
-                <signal name="activate" handler="on_mnuPortsInfo_activate" swapped="no"/>
+                <signal name="activate" handler="on_mnuPortsInfo_activate" />
                 <child>
                   <widget class="GtkMenu" id="menu1">
                     <property name="visible">True</property>
@@ -130,7 +130,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">_Details</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_mnuPortsDetails_activate" swapped="no"/>
+                        <signal name="activate" handler="on_mnuPortsDetails_activate" />
                       </widget>
                     </child>
                     <child>
@@ -139,7 +139,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">_Refresh</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_mnuRefresh_activate" swapped="no"/>
+                        <signal name="activate" handler="on_mnuRefresh_activate" />
                       </widget>
                     </child>
                   </widget>
@@ -152,7 +152,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">_Help</property>
                 <property name="use_underline">True</property>
-                <signal name="activate" handler="on_menuAbout_activate" swapped="no"/>
+                <signal name="activate" handler="on_menuAbout_activate" />
               </widget>
             </child>
           </widget>
@@ -187,7 +187,7 @@
                 <property name="width_request">100</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="changed" handler="on_cboPorts_changed" swapped="no"/>
+                <signal name="changed" handler="on_cboPorts_changed" />
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -215,7 +215,7 @@
                 <property name="width_request">100</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="changed" handler="on_cboBaudrates_changed" swapped="no"/>
+                <signal name="changed" handler="on_cboBaudrates_changed" />
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -246,7 +246,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <signal name="toggled" handler="on_btnConnect_toggled" swapped="no"/>
+                <signal name="toggled" handler="on_btnConnect_toggled" />
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -263,7 +263,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <signal name="clicked" handler="on_btnClear_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_btnClear_clicked" />
               </widget>
               <packing>
                 <property name="expand">False</property>
