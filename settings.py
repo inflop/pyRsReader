@@ -7,7 +7,7 @@ from main import APP_NAME
 
 
 class Settings:
-    __config_path = "".join([os.path.expanduser("~\\"), ".", APP_NAME, ".cfg"])
+    __config_path = "".join([os.path.expanduser("~/."), APP_NAME, ".cfg"])
     __main_section = "Main"
     __port_option_name = "port"
     __baudrate_option_name = "baudrate"
@@ -20,6 +20,10 @@ class Settings:
         self.__config = ConfigParser.ConfigParser()
 
         self.__load_settings_from_file()
+
+    @classmethod
+    def get_config_file_path(cls):
+        return cls.__config_path
 
     def __load_settings_from_file(self):
         self.__config.read(Settings.__config_path)
