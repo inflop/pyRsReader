@@ -14,6 +14,9 @@ from main import APP_NAME
 
 class MainWindow:
     def __init__(self):
+        self.__initialize()
+
+    def __initialize(self):
         self.__mainWindow = gtk_helper.GtkGladeHelper.get_glade_window("mainWindow")
         self.__mainWindowWidget = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
         self.__mainWindowWidget.set_title(APP_NAME)
