@@ -24,7 +24,7 @@ if platform.system() == 'Windows':
         author='infloper',
         author_email='infloper@gmail.com',
         description='Simple RS232 reader written in Python using pySerial and PyGTK library',
-        data_files=[("", glob.glob("main.glade")), os.path.join(gtk_base_path, '..', 'runtime', 'bin', 'gdk-pixbuf-query-loaders.exe'), os.path.join(gtk_base_path, '..', 'runtime', 'bin', 'libxml2-2.dll')],
+        data_files=[("data", glob.glob("data/main.glade")), os.path.join(gtk_base_path, '..', 'runtime', 'bin', 'gdk-pixbuf-query-loaders.exe'), os.path.join(gtk_base_path, '..', 'runtime', 'bin', 'libxml2-2.dll')],
         options={'py2exe': {'packages': 'encodings', 'includes': 'ctypes, cairo, pango, pangocairo, atk, gio'}},
         scripts=[
             "main.py",
@@ -48,7 +48,7 @@ else:
         author='infloper',
         author_email='infloper@gmail.com',
         description='Simple RS232 reader written in Python using pySerial and PyGTK library',
-        data_files=[("", glob.glob("main.glade"))],
+        data_files=[("data", glob.glob("data/main.glade"))],
         scripts=[
             "main.py",
             "gtk_helper.py",

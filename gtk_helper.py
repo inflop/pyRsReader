@@ -10,7 +10,7 @@ class GtkGladeHelper:
     def __init__(self):
         pass
 
-    __glade_file = "main.glade"
+    __glade_file = "data/main.glade"
 
     @classmethod
     def get_glade_window(cls, name):
