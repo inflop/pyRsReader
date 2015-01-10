@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from distutils.core import setup
 import glob
 import os
 import sys
 import platform
+from main import APP_NAME
 
 if platform.system() == 'Windows':
     import py2exe
@@ -29,9 +33,10 @@ if platform.system() == 'Windows':
             "generator_task.py",
             "main_window.py",
             "ports_info_window.py",
-            "about_window.py"
+            "about_window.py",
+            "settings.py"
             ],
-        windows=[{"script": "main.py", "dest_base": "pyRsReader"}],
+        windows=[{"script": "main.py", "dest_base": APP_NAME}],
         requires=["pygtk"]
     )
 else:
@@ -51,7 +56,8 @@ else:
             "generator_task.py",
             "main_window.py",
             "ports_info_window.py",
-            "about_window.py"
+            "about_window.py",
+            "settings.py"
             ],
         requires=['pygtk']
     )

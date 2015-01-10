@@ -9,6 +9,7 @@ import serial_helper
 import generator_task
 import ports_info_window
 import about_window
+import settings
 from main import APP_NAME
 
 
@@ -17,6 +18,8 @@ class MainWindow:
         self.__initialize()
 
     def __initialize(self):
+        self.__Settings = settings.Settings()
+
         self.__mainWindow = gtk_helper.GtkGladeHelper.get_glade_window("mainWindow")
         self.__mainWindowWidget = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
         self.__mainWindowWidget.set_title(APP_NAME)
@@ -31,6 +34,7 @@ class MainWindow:
         self.__txt_data.set_editable(True)
         self.__txt_data.connect("size-allocate", self.__autoscroll)
         self.__chkScroll = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "chkScroll")
+        self.__chkScroll.set_active(self.__Settings.get_autoscroll())
         self.__sbStatus = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "sbStatus")
 
         self.__fill_baud_rates_combobox()
@@ -69,6 +73,9 @@ class MainWindow:
         about_dlg.run()
 
     def __fill_ports_combobox(self):
+        default_port = self.__Settings.get_port()
+        counter = 0
+        default_index = 0
         self.__cbo_ports.set_model(None)
         self.__cbo_ports.clear()
         store = gtk.ListStore(str)
@@ -76,6 +83,9 @@ class MainWindow:
 
         for port in ports_names:
             store.append([port])
+            if port == default_port:
+                default_index = counter
+            counter += 1
 
         self.__cbo_ports.set_model(store)
 
@@ -86,14 +96,23 @@ class MainWindow:
         if len(ports_names) == 1:
             self.__cbo_ports.set_active(0)
 
+        self.__cbo_ports.set_active(default_index)
+
     def __fill_baud_rates_combobox(self):
+        default_baudrate = self.__Settings.get_baudrate()
+        counter = 0
+        default_index = 0
         store = gtk.ListStore(str)
         baud_rates = serial_helper.SerialHelper.get_available_baud_rates()
 
         for baud_rate in baud_rates:
             store.append([baud_rate])
+            if baud_rate == default_baudrate:
+                default_index = counter
+            counter += 1
 
         self.__cbo_baud_rates.set_model(store)
+        self.__cbo_baud_rates.set_active(default_index)
 
         cell = gtk.CellRendererText()
         self.__cbo_baud_rates.pack_start(cell, True)
@@ -107,15 +126,18 @@ class MainWindow:
             self.__btn_connect.set_label("Connect")
             self.__sbStatus.push(0, "Disconnected")
 
-        gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(not self.__is_connected)
+        gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(
+            not self.__is_connected)
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
         self.__cbo_ports.set_sensitive(not self.__is_connected)
 
         self.__combobox_changed()
 
     def __combobox_changed(self):
-        is_port_selected = self.__cbo_ports.get_active_text() is not None and len(self.__cbo_ports.get_active_text()) > 0
-        is_baudrate_selected = self.__cbo_baud_rates.get_active_text() is not None and len(self.__cbo_baud_rates.get_active_text()) > 0
+        is_port_selected = self.__cbo_ports.get_active_text() is not None and len(
+            self.__cbo_ports.get_active_text()) > 0
+        is_baudrate_selected = self.__cbo_baud_rates.get_active_text() is not None and len(
+            self.__cbo_baud_rates.get_active_text()) > 0
         enable_btn_connect = is_port_selected and is_baudrate_selected
 
         self.__btn_connect.set_sensitive(enable_btn_connect)
@@ -145,7 +167,8 @@ class MainWindow:
                 self.__Serial = serial.Serial(selected_port, baud_rate)
                 self.__is_connected = True
             except serial.SerialException:
-                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.", self.__mainWindow)
+                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.",
+                                                         self.__mainWindow)
                 self.__btn_connect.set_active(False)
                 self.__refresh_ports()
                 return
@@ -187,16 +210,30 @@ class MainWindow:
 
         gtk.main_quit()
 
+    def __save_settings(self):
+        port = self.__cbo_ports.get_active_text()
+        baudrate = self.__cbo_baud_rates.get_active_text()
+        autoscroll = self.__chkScroll.get_active()
+
+        self.__Settings.set_port(port)
+        self.__Settings.set_baudrate(baudrate)
+        self.__Settings.set_autoscroll(autoscroll)
+        self.__Settings.save()
+
     def __on_close(self, widget, event, data):
         result = False
 
         if self.__is_connected:
-            response = gtk_helper.GtkGladeHelper.show_question_msg("Connection is established. Are you sure you want to quit?", self.__mainWindowWidget)
+            response = gtk_helper.GtkGladeHelper.show_question_msg(
+                "Connection is established. Are you sure you want to quit?", self.__mainWindowWidget)
 
             if response == gtk.RESPONSE_YES:
                 gtk.main_quit()
                 result = False
             else:
                 result = True
+
+        if not result:
+            self.__save_settings()
 
         return result
