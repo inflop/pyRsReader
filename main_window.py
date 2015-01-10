@@ -142,7 +142,7 @@ class MainWindow:
                 self.__Serial = serial.Serial(selected_port, baud_rate)
                 self.__is_connected = True
             except serial.SerialException:
-                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.")
+                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.", self.__mainWindow)
                 self.__btn_connect.set_active(False)
                 self.__refresh_ports()
                 return
@@ -188,7 +188,7 @@ class MainWindow:
         result = False
 
         if self.__is_connected:
-            response = gtk_helper.GtkGladeHelper.show_question_msg("Connection is established. Are you sure you want to quit?")
+            response = gtk_helper.GtkGladeHelper.show_question_msg("Connection is established. Are you sure you want to quit?", self.__mainWindowWidget)
 
             if response == gtk.RESPONSE_YES:
                 gtk.main_quit()
