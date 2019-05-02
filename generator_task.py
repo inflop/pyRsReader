@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import threading
-import thread
-import gobject
+from multiprocessing import Queue, Process
+from gi.repository import GObject
 
 
 class GeneratorTask(object):
@@ -18,9 +18,9 @@ class GeneratorTask(object):
         for ret in self.generator(*args, **kwargs):
             if self._stopped:
                 thread.exit()
-            gobject.idle_add(self._loop, ret)
+            GObject.idle_add(self._loop, ret)
         if self.complete_callback is not None:
-            gobject.idle_add(self.complete_callback)
+            GObject.idle_add(self.complete_callback)
 
     def _loop(self, ret):
         if ret is None:

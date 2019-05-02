@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import gtk
+from gi.repository import Gtk
 import serial
 import gtk_helper
 import serial_helper
@@ -11,44 +11,32 @@ import ports_info_window
 import about_window
 import settings
 from main import APP_NAME
+from base_window import BaseWindow
 
 
-class MainWindow:
+class MainWindow(BaseWindow):
     def __init__(self):
+        BaseWindow.__init__(self, "mainWindow", __file__)
         self.__initialize()
 
     def __initialize(self):
         self.__Settings = settings.Settings()
 
-        self.__mainWindow = gtk_helper.GtkGladeHelper.get_glade_window("mainWindow")
-        self.__mainWindowWidget = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mainWindow")
-        self.__mainWindowWidget.set_title(APP_NAME)
-
-        self.__swScrollWindow = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "swScrollWindow")
-
-        self.__cbo_ports = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "cboPorts")
-        self.__cbo_baud_rates = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "cboBaudrates")
-        self.__btn_connect = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "btnConnect")
+        self.__swScrollWindow = self._builder.get_object("swScrollWindow")
+        self.__cbo_ports = self._builder.get_object("cboPorts")
+        self.__cbo_baud_rates = self._builder.get_object("cboBaudrates")
+        self.__btn_connect = self._builder.get_object("btnConnect")
         self.__btn_connect.set_sensitive(False)
-        self.__txt_data = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "txtData")
+        self.__txt_data = self._builder.get_object("txtData")
         self.__txt_data.set_editable(True)
         self.__txt_data.connect("size-allocate", self.__autoscroll)
-        self.__chkScroll = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "chkScroll")
+        self.__chkScroll = self._builder.get_object("chkScroll")
         self.__chkScroll.set_active(self.__Settings.get_autoscroll())
-        self.__sbStatus = gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "sbStatus")
+        self.__sbStatus = self._builder.get_object("sbStatus")
 
         self.__fill_baud_rates_combobox()
 
-        self.__signals = {"on_mainWindow_destroy": self.__destroy,
-                          "on_btnConnect_toggled": self.__read_data,
-                          "on_mnuPortsDetails_activate": self.__port_info_activate,
-                          "on_mnuRefresh_activate": self.on_mnu_refresh_activate,
-                          "on_menuAbout_activate": self.__about_dlg_activate,
-                          "on_cboPorts_changed": self.__on_cbo_ports_changed,
-                          "on_cboBaudrates_changed": self.__on_cbo_baudrates_changed,
-                          "on_btnClear_clicked": self.__on_btnClear_clicked}
-        self.__mainWindow.signal_autoconnect(self.__signals)
-        self.__mainWindowWidget.connect("delete-event", self.__on_close, None)
+        self._window.connect("delete-event", self.__on_close, None)
 
         self.__Serial = None
         self.__refresh_text_view_task = None
@@ -56,11 +44,11 @@ class MainWindow:
 
         self.__refresh_ports()
 
-    def __port_info_activate(self, widget):
-        ports_info_wnd = ports_info_window.PortInfoWindow(self.__mainWindowWidget)
+    def on_mnuPortsDetails_activate(self, widget):
+        ports_info_wnd = ports_info_window.PortInfoWindow(self._window)
         ports_info_wnd.run()
 
-    def on_mnu_refresh_activate(self, widget):
+    def on_mnuRefresh_activate(self, widget):
         self.__refresh_ports()
 
     def __refresh_ports(self):
@@ -68,8 +56,8 @@ class MainWindow:
         self.__fill_ports_combobox()
         self.__refresh_connect_controls_state()
 
-    def __about_dlg_activate(self, widget):
-        about_dlg = about_window.AboutDlg(self.__mainWindowWidget)
+    def on_menuAbout_activate(self, widget):
+        about_dlg = about_window.AboutDlg(self._window)
         about_dlg.run()
 
     def __fill_ports_combobox(self):
@@ -78,8 +66,9 @@ class MainWindow:
         default_index = 0
         self.__cbo_ports.set_model(None)
         self.__cbo_ports.clear()
-        store = gtk.ListStore(str)
+        store = Gtk.ListStore(str)
         ports_names = serial_helper.SerialHelper.get_available_ports_names()
+        print(ports_names)
 
         for port in ports_names:
             store.append([port])
@@ -89,7 +78,7 @@ class MainWindow:
 
         self.__cbo_ports.set_model(store)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         self.__cbo_ports.pack_start(cell, True)
         self.__cbo_ports.add_attribute(cell, 'text', 0)
 
@@ -102,7 +91,7 @@ class MainWindow:
         default_baudrate = self.__Settings.get_baudrate()
         counter = 0
         default_index = 0
-        store = gtk.ListStore(str)
+        store = Gtk.ListStore(str)
         baud_rates = serial_helper.SerialHelper.get_available_baud_rates()
 
         for baud_rate in baud_rates:
@@ -114,19 +103,16 @@ class MainWindow:
         self.__cbo_baud_rates.set_model(store)
         self.__cbo_baud_rates.set_active(default_index)
 
-        cell = gtk.CellRendererText()
-        self.__cbo_baud_rates.pack_start(cell, True)
-        self.__cbo_baud_rates.add_attribute(cell, 'text', 0)
-
     def __refresh_connect_controls_state(self):
         if self.__is_connected:
             self.__btn_connect.set_label("Disconnect")
-            self.__sbStatus.push(0, self.__cbo_ports.get_active_text() + " - Connected")
+            self.__sbStatus.push(
+                0, self.__cbo_ports.get_active_text() + " - Connected")
         else:
             self.__btn_connect.set_label("Connect")
             self.__sbStatus.push(0, "Disconnected")
 
-        gtk_helper.GtkGladeHelper.get_window_control(self.__mainWindow, "mnuPortsRefresh").set_sensitive(
+        self._builder.get_object("mnuPortsRefresh").set_sensitive(
             not self.__is_connected)
         self.__cbo_baud_rates.set_sensitive(not self.__is_connected)
         self.__cbo_ports.set_sensitive(not self.__is_connected)
@@ -142,13 +128,13 @@ class MainWindow:
 
         self.__btn_connect.set_sensitive(enable_btn_connect)
 
-    def __on_cbo_ports_changed(self, widget):
+    def on_cboPorts_changed(self, widget):
         self.__combobox_changed()
 
-    def __on_cbo_baudrates_changed(self, widget):
+    def on_cboBaudrates_changed(self, widget):
         self.__combobox_changed()
 
-    def __on_btnClear_clicked(self, widget):
+    def on_btnClear_clicked(self, widget):
         generator_task.GeneratorTask(lambda: " ", self.__clear).start()
 
     def __autoscroll(self, *args):
@@ -158,7 +144,7 @@ class MainWindow:
             adj = self.__swScrollWindow.get_vadjustment()
             adj.set_value(adj.get_upper() - adj.get_page_size())
 
-    def __read_data(self, widget):
+    def on_btnConnect_toggled(self, widget):
         if not self.__is_connected:
             selected_port = self.__cbo_ports.get_active_text()
             baud_rate = int(self.__cbo_baud_rates.get_active_text())
@@ -168,7 +154,7 @@ class MainWindow:
                 self.__is_connected = True
             except serial.SerialException:
                 gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.",
-                                                         self.__mainWindowWidget)
+                                                         self._window)
                 self.__btn_connect.set_active(False)
                 self.__refresh_ports()
                 return
@@ -183,7 +169,8 @@ class MainWindow:
                     self.__is_connected = False
                     self.__refresh_ports()
 
-            self.__refresh_text_view_task = generator_task.GeneratorTask(gen, self.__append)
+            self.__refresh_text_view_task = generator_task.GeneratorTask(
+                gen, self.__append)
             self.__refresh_text_view_task.start()
         else:
             self.__refresh_text_view_task.stop()
@@ -194,21 +181,22 @@ class MainWindow:
 
     def __append(self, *args):
         try:
-            self.__txt_data.get_buffer().insert(self.__txt_data.get_buffer().get_end_iter(), *args)
+            self.__txt_data.get_buffer().insert(
+                self.__txt_data.get_buffer().get_end_iter(), *args)
         except:
             pass
 
     def __clear(self, *args):
         self.__txt_data.get_buffer().set_text("")
 
-    def __destroy(self, widget):
+    def on_mainWindow_destroy(self, widget):
         if self.__refresh_text_view_task is not None:
             self.__refresh_text_view_task.stop()
 
         if self.__Serial is not None:
             self.__Serial.close()
 
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def __save_settings(self):
         port = self.__cbo_ports.get_active_text()
@@ -225,10 +213,10 @@ class MainWindow:
 
         if self.__is_connected:
             response = gtk_helper.GtkGladeHelper.show_question_msg(
-                "Connection is established. Are you sure you want to quit?", self.__mainWindowWidget)
+                "Connection is established. Are you sure you want to quit?", self._window)
 
-            if response == gtk.RESPONSE_YES:
-                gtk.main_quit()
+            if response == Gtk.RESPONSE_YES:
+                Gtk.main_quit()
                 result = False
             else:
                 result = True

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import ConfigParser
+import configparser
 from main import APP_NAME
 
 
@@ -17,7 +17,7 @@ class Settings:
         self.__port = ""
         self.__baudrate = ""
         self.__autoscroll = False
-        self.__config = ConfigParser.ConfigParser()
+        self.__config = configparser.ConfigParser()
 
         self.__load_settings_from_file()
 

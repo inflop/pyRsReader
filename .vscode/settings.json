@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "__pycache__": true,
+        "*.pyc": true,
+        "*.ui~": true,
+        "tempCodeRunnerFile.py": true,
+        ".gitignore": true
+    }
+}

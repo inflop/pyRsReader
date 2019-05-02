@@ -1,19 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import gtk
+from gi.repository import Gtk
 import gtk_helper
+from base_window import BaseWindow
 from main import APP_NAME
 
 
-class AboutDlg:
+class AboutDlg(BaseWindow):
     def __init__(self, parent_window):
-        self.__dlgAbout = gtk_helper.GtkGladeHelper.get_glade_window("dlgAbout")
-        self.__dlg = gtk_helper.GtkGladeHelper.get_window_control(self.__dlgAbout, "dlgAbout")
-        self.__dlg.set_transient_for(parent_window)
-        self.__dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-        self.__dlg.set_title(APP_NAME)
+        BaseWindow.__init__(self, "dlgAbout", __file__)
+        self._window.set_transient_for(parent_window)
+        self._window.set_position(Gtk.WIN_POS_CENTER_ON_PARENT)
 
     def run(self):
-        self.__dlg.run()
-        self.__dlg.destroy()
+        self._window.run()
+        self._window.destroy()

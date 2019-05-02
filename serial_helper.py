@@ -17,7 +17,7 @@ class SerialHelper:
 
     @classmethod
     def get_available_ports_names(cls):
-        return map(lambda port: port[0], cls.__available_ports)
+        return list(map(lambda port: port[0], cls.__available_ports))
 
     @staticmethod
     def get_available_baud_rates():
