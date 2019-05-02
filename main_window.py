@@ -16,7 +16,7 @@ from base_window import BaseWindow
 
 class MainWindow(BaseWindow):
     def __init__(self):
-        BaseWindow.__init__(self, "mainWindow", __file__)
+        BaseWindow.__init__(self, __file__)
         self.__initialize()
 
     def __initialize(self):

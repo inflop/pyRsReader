@@ -9,7 +9,7 @@ from main import APP_NAME
 
 class AboutDlg(BaseWindow):
     def __init__(self, parent_window):
-        BaseWindow.__init__(self, "dlgAbout", __file__)
+        BaseWindow.__init__(self, __file__)
         print(parent_window)
         self._window.set_transient_for(parent_window)
         self._window.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)

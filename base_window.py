@@ -7,8 +7,7 @@ from main import APP_NAME
 
 
 class BaseWindow:
-    def __init__(self, window_id, filename=__file__):
-        self.__window_id = window_id
+    def __init__(self, filename=__file__):
         self.__ui_filename = os.path.splitext(
             os.path.basename(filename))[0] + ".ui"
 
@@ -18,7 +17,7 @@ class BaseWindow:
         self._builder = Gtk.Builder()
         self._builder.add_from_file(self.__ui_filename)
         self._builder.connect_signals(self)
-        self._window = self._builder.get_object(self.__window_id)
+        self._window = self._builder.get_object("window")
         self._window.set_title(APP_NAME)
         self._window.show_all()
 
