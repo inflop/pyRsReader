@@ -211,7 +211,7 @@ class MainWindow(BaseWindow):
             response = gtk_helper.GtkGladeHelper.show_question_msg(
                 "Connection is established. Are you sure you want to quit?", self._window)
 
-            if response == Gtk.RESPONSE_YES:
+            if response == Gtk.ResponseType.YES:
                 Gtk.main_quit()
                 result = False
             else:

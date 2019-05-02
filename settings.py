@@ -34,7 +34,7 @@ class Settings:
 
         self.__port = self.__config[Settings.__main_section][Settings.__port_option_name]
         self.__baudrate = self.__config[Settings.__main_section][Settings.__baudrate_option_name]
-        self.__autoscroll = self.__config[Settings.__main_section][Settings.__autoscroll_option_name]
+        self.__autoscroll = eval(self.__config[Settings.__main_section][Settings.__autoscroll_option_name])
 
     @property
     def port(self):
@@ -64,13 +64,9 @@ class Settings:
         if not self.__config.has_section(Settings.__main_section):
             self.__config.add_section(Settings.__main_section)
 
-        # print(Settings.__port_option_name, self.__port)
-        # print(Settings.__baudrate_option_name, self.__baudrate)
-        # print(Settings.__autoscroll_option_name, self.__autoscroll)
+        self.__config[Settings.__main_section][Settings.__port_option_name] = str(self.__port)
+        self.__config[Settings.__main_section][Settings.__baudrate_option_name] = str(self.__baudrate)
+        self.__config[Settings.__main_section][Settings.__autoscroll_option_name] = str(self.__autoscroll)
 
-        self.__config[Settings.__main_section][Settings.__port_option_name] = self.__port
-        self.__config[Settings.__main_section][Settings.__baudrate_option_name] = self.__baudrate
-        self.__config[Settings.__main_section][Settings.__autoscroll_option_name] = self.__autoscroll
-
-        with open(Settings.__config_path, "wb") as configfile:
+        with open(Settings.__config_path, "w") as configfile:
             self.__config.write(configfile)

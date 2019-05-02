@@ -6,20 +6,6 @@ from main import APP_NAME
 
 
 class GtkGladeHelper:
-    def __init__(self, ui_file):
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file(ui_file)
-
-    @classmethod
-    def get_glade_window(cls, name, ui_file):
-        builder = Gtk.Builder()
-        builder.add_from_file(ui_file)
-        return builder.get_object(name)
-
-    @staticmethod
-    def get_window_control(window, control_name):
-        return window.get_object(control_name)
-
     @staticmethod
     def show_error_msg(msg, parent_window=None):
         position = Gtk.WindowPosition.CENTER_ALWAYS
