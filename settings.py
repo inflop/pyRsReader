@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import configparser
 from main import APP_NAME
 
@@ -31,35 +32,45 @@ class Settings:
         if not self.__config.has_section(Settings.__main_section):
             return
 
-        self.__port = self.__config.get(Settings.__main_section, Settings.__port_option_name)
-        self.__baudrate = self.__config.get(Settings.__main_section, Settings.__baudrate_option_name)
-        self.__autoscroll = self.__config.getboolean(Settings.__main_section, Settings.__autoscroll_option_name)
+        self.__port = self.__config[Settings.__main_section][Settings.__port_option_name]
+        self.__baudrate = self.__config[Settings.__main_section][Settings.__baudrate_option_name]
+        self.__autoscroll = self.__config[Settings.__main_section][Settings.__autoscroll_option_name]
 
-    def set_port(self, value):
-        self.__port = value
-
-    def get_port(self):
+    @property
+    def port(self):
         return self.__port
 
-    def set_baudrate(self, value):
-        self.__baudrate = value
+    @port.setter
+    def port(self, value):
+        self.__port = value
 
-    def get_baudrate(self):
+    @property
+    def baudrate(self):
         return self.__baudrate
 
-    def set_autoscroll(self, value):
-        self.__autoscroll = value
+    @baudrate.setter
+    def baudrate(self, value):
+        self.__baudrate = value
 
-    def get_autoscroll(self):
+    @property
+    def autoscroll(self):
         return self.__autoscroll
+
+    @autoscroll.setter
+    def autoscroll(self, value):
+        self.__autoscroll = value
 
     def save(self):
         if not self.__config.has_section(Settings.__main_section):
             self.__config.add_section(Settings.__main_section)
 
-        self.__config.set(Settings.__main_section, Settings.__port_option_name, self.__port)
-        self.__config.set(Settings.__main_section, Settings.__baudrate_option_name, self.__baudrate)
-        self.__config.set(Settings.__main_section, Settings.__autoscroll_option_name, self.__autoscroll)
+        # print(Settings.__port_option_name, self.__port)
+        # print(Settings.__baudrate_option_name, self.__baudrate)
+        # print(Settings.__autoscroll_option_name, self.__autoscroll)
+
+        self.__config[Settings.__main_section][Settings.__port_option_name] = self.__port
+        self.__config[Settings.__main_section][Settings.__baudrate_option_name] = self.__baudrate
+        self.__config[Settings.__main_section][Settings.__autoscroll_option_name] = self.__autoscroll
 
         with open(Settings.__config_path, "wb") as configfile:
             self.__config.write(configfile)

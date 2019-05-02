@@ -20,7 +20,7 @@ class MainWindow(BaseWindow):
         self.__initialize()
 
     def __initialize(self):
-        self.__Settings = settings.Settings()
+        self.__settings = settings.Settings()
 
         self.__swScrollWindow = self._builder.get_object("swScrollWindow")
         self.__cbo_ports = self._builder.get_object("cboPorts")
@@ -31,7 +31,7 @@ class MainWindow(BaseWindow):
         self.__txt_data.set_editable(True)
         self.__txt_data.connect("size-allocate", self.__autoscroll)
         self.__chkScroll = self._builder.get_object("chkScroll")
-        self.__chkScroll.set_active(self.__Settings.get_autoscroll())
+        self.__chkScroll.set_active(self.__settings.autoscroll)
         self.__sbStatus = self._builder.get_object("sbStatus")
 
         self.__fill_baud_rates_combobox()
@@ -61,7 +61,7 @@ class MainWindow(BaseWindow):
         about_dlg.run()
 
     def __fill_ports_combobox(self):
-        default_port = self.__Settings.get_port()
+        default_port = self.__settings.port
         counter = 0
         default_index = 0
         self.__cbo_ports.set_model(None)
@@ -88,7 +88,7 @@ class MainWindow(BaseWindow):
         self.__cbo_ports.set_active(default_index)
 
     def __fill_baud_rates_combobox(self):
-        default_baudrate = self.__Settings.get_baudrate()
+        default_baudrate = self.__settings.baudrate
         counter = 0
         default_index = 0
         store = Gtk.ListStore(str)
@@ -199,14 +199,10 @@ class MainWindow(BaseWindow):
         Gtk.main_quit()
 
     def __save_settings(self):
-        port = self.__cbo_ports.get_active_text()
-        baudrate = self.__cbo_baud_rates.get_active_text()
-        autoscroll = self.__chkScroll.get_active()
-
-        self.__Settings.set_port(port)
-        self.__Settings.set_baudrate(baudrate)
-        self.__Settings.set_autoscroll(autoscroll)
-        self.__Settings.save()
+        self.__settings.port = self.__cbo_ports.get_active_text()
+        self.__settings.baudrate = self.__cbo_baud_rates.get_active_text()
+        self.__settings.autoscroll = self.__chkScroll.get_active()
+        self.__settings.save()
 
     def __on_close(self, widget, event, data):
         result = False
