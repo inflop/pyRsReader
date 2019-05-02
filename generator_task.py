@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import _thread
 import threading
-from multiprocessing import Queue, Process
 from gi.repository import GObject
 
 
@@ -17,7 +17,7 @@ class GeneratorTask(object):
         self._stopped = False
         for ret in self.generator(*args, **kwargs):
             if self._stopped:
-                thread.exit()
+                _thread.exit()
             GObject.idle_add(self._loop, ret)
         if self.complete_callback is not None:
             GObject.idle_add(self.complete_callback)

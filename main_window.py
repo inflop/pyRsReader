@@ -68,7 +68,6 @@ class MainWindow(BaseWindow):
         self.__cbo_ports.clear()
         store = Gtk.ListStore(str)
         ports_names = serial_helper.SerialHelper.get_available_ports_names()
-        print(ports_names)
 
         for port in ports_names:
             store.append([port])
@@ -167,6 +166,7 @@ class MainWindow(BaseWindow):
                     yield "Selected device can not be found or can not be configured.\n"
                     self.__btn_connect.set_active(False)
                     self.__is_connected = False
+                    self.__refresh_text_view_task.stop()
                     self.__refresh_ports()
 
             self.__refresh_text_view_task = generator_task.GeneratorTask(
@@ -212,6 +212,7 @@ class MainWindow(BaseWindow):
                 "Connection is established. Are you sure you want to quit?", self._window)
 
             if response == Gtk.ResponseType.YES:
+                self.__refresh_text_view_task.stop()
                 Gtk.main_quit()
                 result = False
             else:

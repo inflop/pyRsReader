@@ -15,12 +15,12 @@ APP_NAME = "pyRsReader"
 import sys
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, GObject
 import gtk_helper
 import serial_helper
 import main_window
 
-Gdk.threads_init()
+GObject.threads_init()
 
 if __name__ == "__main__":
     if len(serial_helper.SerialHelper.get_available_ports()) == 0:
