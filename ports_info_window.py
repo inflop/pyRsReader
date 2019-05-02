@@ -36,6 +36,12 @@ class PortInfoWindow(BaseWindow):
         column.set_sort_column_id(column_id)
         self.__tree_view.append_column(column)
 
+    def on_btnClose_clicked(self, widget):
+        self.__on_close()
+
+    def __on_close(self):
+        self._window.destroy()
+
     def run(self):
         self._window.run()
-        self._window.destroy()
+        self.__on_close()

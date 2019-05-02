@@ -13,7 +13,13 @@ class AboutDlg(BaseWindow):
         print(parent_window)
         self._window.set_transient_for(parent_window)
         self._window.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+    
+    def __on_close(self):
+        self._window.destroy()
 
     def run(self):
         self._window.run()
-        self._window.destroy()
+        self.__on_close()
+
+    def on_btnClose_clicked(self, widget):
+        self.__on_close()
