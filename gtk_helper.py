@@ -22,11 +22,11 @@ class GtkGladeHelper:
 
     @staticmethod
     def show_error_msg(msg, parent_window=None):
-        position = Gtk.WIN_POS_CENTER_ALWAYS
+        position = Gtk.WindowPosition.CENTER_ALWAYS
         if parent_window is not None:
-            position = Gtk.WIN_POS_CENTER_ON_PARENT
+            position = Gtk.WindowPosition.CENTER_ON_PARENT
 
-        dlg = Gtk.MessageDialog(parent_window, Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_ERROR, Gtk.BUTTONS_CLOSE, msg)
+        dlg = Gtk.MessageDialog(parent_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, msg)
         dlg.set_position(position)
         dlg.set_title(APP_NAME)
         dlg.run()
@@ -34,11 +34,11 @@ class GtkGladeHelper:
 
     @staticmethod
     def show_question_msg(question, parent_window=None):
-        position = Gtk.WIN_POS_CENTER_ALWAYS
+        position = Gtk.WindowPosition.CENTER_ALWAYS
         if parent_window is not None:
-            position = Gtk.WIN_POS_CENTER_ON_PARENT
+            position = Gtk.WindowPosition.CENTER_ON_PARENT
 
-        dlg = Gtk.MessageDialog(parent_window, Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_YES_NO, question)
+        dlg = Gtk.MessageDialog(parent_window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question)
         dlg.set_position(position)
         dlg.set_title(APP_NAME)
 
