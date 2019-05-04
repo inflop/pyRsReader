@@ -18,17 +18,17 @@ class PortInfoWindow(BaseWindow):
         self.__add_column("Description", 1)
         self.__add_column("VID:PID", 2)
 
-        self.port_list = None
+        self.port_list_store = None
         self.__fill_tree_view()
 
     def __fill_tree_view(self):
         ports = serial_helper.SerialHelper.get_available_ports()
-        self.port_list = Gtk.ListStore(str, str, str)
+        self.port_list_store = Gtk.ListStore(str, str, str)
 
         for port in ports:
-            self.port_list.append([port[0], port[1], port[2]])
+            self.port_list_store.append([port[0], port[1], port[2]])
 
-        self.__tree_view.set_model(self.port_list)
+        self.__tree_view.set_model(self.port_list_store)
 
     def __add_column(self, title, column_id):
         column = Gtk.TreeViewColumn(title, Gtk.CellRendererText(), text=column_id)
