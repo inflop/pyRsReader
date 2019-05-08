@@ -5,6 +5,7 @@
 from gi.repository import Gtk, GObject, GLib
 import serial
 import gtk_helper
+import generator_task
 import serial_helper
 import threading, queue, time
 import ports_info_window
@@ -125,27 +126,35 @@ class MainWindow(BaseWindow):
             adj.set_value(adj.get_upper() - adj.get_page_size())
 
     def on_btnConnect_toggled(self, widget):
-        is_active = widget.get_active()
-        if is_active and not self.__serial.is_open:
+        self.__read_data()
+
+    def __read_data(self):
+        if not self.__serial.is_open:
             self.__serial.port = self.__cbo_ports.get_active_text()
             self.__serial.baudrate = int(self.__cbo_baud_rates.get_active_text())
 
             try:
-                self.__serial.open()
-                self.run_gen(self.reading_serial)
-                # self.__reading_thread = threading.Thread(target=self.reading_serial)
-                # self.__reading_thread.daemon = True
-                # self.__reading_thread.start()
-                # GLib.timeout_add(500, self.__check_serial_message_queue)
+                self.__serial = serial.Serial(self.__serial.port, self.__serial.baudrate)
             except serial.SerialException:
-                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.",
-                                                         self._window)
+                gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.", self._window)
                 self.__btn_connect.set_active(False)
                 self.__refresh_ports()
                 return
+
+            def gen():
+                try:
+                    while self.__serial.readable():
+                        yield self.__serial.readline().decode("utf-8")
+                except serial.SerialException:
+                    yield "Selected device can not be found or can not be configured.\n"
+                    self.__btn_connect.set_active(False)
+                    self.__refresh_ports()
+
+            self.__refresh_text_view_task = generator_task.GeneratorTask(gen, self.__append)
+            self.__refresh_text_view_task.start()
         else:
-            self.__close_port()
-            self.__stop_reading_thread()
+            self.__refresh_text_view_task.stop()
+            self.__serial.close()
 
         self.__refresh_connect_controls_state()
 
