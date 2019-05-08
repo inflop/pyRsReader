@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 __author__ = "infloper"
@@ -15,12 +15,14 @@ APP_NAME = "pyRsReader"
 import sys
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, GLib, Gdk
 import gtk_helper
 import serial_helper
 import main_window
 
-GObject.threads_init()
+GLib.threads_init()     # ?
+GObject.threads_init()  # YES!
+#Gdk.threads_init() # deprecated
 
 if __name__ == "__main__":
     if len(serial_helper.SerialHelper.get_available_ports()) == 0:

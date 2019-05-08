@@ -3,7 +3,7 @@
 
 import _thread
 import threading
-from gi.repository import GObject
+from gi.repository import GLib
 
 
 class GeneratorTask(object):
@@ -18,9 +18,9 @@ class GeneratorTask(object):
         for ret in self.generator(*args, **kwargs):
             if self._stopped:
                 _thread.exit()
-            GObject.idle_add(self._loop, ret)
+            GLib.idle_add(self._loop, ret)
         if self.complete_callback is not None:
-            GObject.idle_add(self.complete_callback)
+            GLib.idle_add(self.complete_callback)
 
     def _loop(self, ret):
         if ret is None:
