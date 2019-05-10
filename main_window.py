@@ -7,7 +7,7 @@ import serial
 import gtk_helper
 import generator_task
 import serial_helper
-import threading, queue, time
+import threading
 import ports_info_window
 import about_window
 import settings
@@ -32,7 +32,7 @@ class MainWindow(BaseWindow):
         self.__btn_connect.set_sensitive(False)
         self.__txt_data = self._builder.get_object("txtData")
         self.__txt_data.set_editable(True)
-        #self.__txt_data.connect("size-allocate", self.__autoscroll)
+        self.__txt_data.connect("size-allocate", self.__autoscroll)
         self.__chkScroll = self._builder.get_object("chkScroll")
         self.__chkScroll.set_active(self.__settings.autoscroll)
         self.__sbStatus = self._builder.get_object("sbStatus")
@@ -41,8 +41,7 @@ class MainWindow(BaseWindow):
         self.__menu_ports_refresh = self._builder.get_object("mnuPortsRefresh")
 
         self.__serial = serial.Serial()
-        self.__serial_message_queue = queue.Queue()
-        self.__reading_thread = None
+        self.__refresh_text_view_task = None
 
         self.__refresh_ports()
 
@@ -84,7 +83,7 @@ class MainWindow(BaseWindow):
 
     def __fill_baud_rates_combobox(self):
         baud_rates = serial_helper.SerialHelper.get_available_baud_rates()
-        default_index = baud_rates.index(self.__settings.baudrate)
+        default_index = baud_rates.index(self.__settings.baudrate) if self.__settings.baudrate in baud_rates else 0
         store = Gtk.ListStore(str)        
 
         for baud_rate in baud_rates:
@@ -95,11 +94,11 @@ class MainWindow(BaseWindow):
 
     def __refresh_connect_controls_state(self):
         connected = self.__serial.is_open
-        self.__btn_connect.set_label("Disconnect" if self.__serial.is_open else "Connect")
-        self.__sbStatus.push(0, self.__cbo_ports.get_active_text() + " - Connected" if self.__serial.is_open else "Disconnected")        
+        self.__btn_connect.set_label("Disconnect" if connected else "Connect")
         self.__menu_ports_refresh.set_sensitive(not connected)
         self.__cbo_baud_rates.set_sensitive(not connected)
         self.__cbo_ports.set_sensitive(not connected)
+        self.__sbStatus.push(0, self.__cbo_ports.get_active_text() + " - Connected" if self.__serial.is_open else "Disconnected")        
         self.__combobox_changed()
 
     def __combobox_changed(self):
@@ -115,38 +114,32 @@ class MainWindow(BaseWindow):
         self.__combobox_changed()
 
     def on_btnClear_clicked(self, widget):
-        #generator_task.GeneratorTask(lambda: " ", self.__clear).start()
-        pass
+        generator_task.GeneratorTask(lambda: " ", self.__clear).start()
 
     def __autoscroll(self, *args):
-        autoscroll_checked = self.__chkScroll.get_active()
-
-        if autoscroll_checked:
+        if self.__chkScroll.get_active():
             adj = self.__swScrollWindow.get_vadjustment()
             adj.set_value(adj.get_upper() - adj.get_page_size())
 
     def on_btnConnect_toggled(self, widget):
-        self.__read_data()
-
-    def __read_data(self):
         if not self.__serial.is_open:
             self.__serial.port = self.__cbo_ports.get_active_text()
             self.__serial.baudrate = int(self.__cbo_baud_rates.get_active_text())
 
             try:
-                self.__serial = serial.Serial(self.__serial.port, self.__serial.baudrate)
+                self.__serial.open()
             except serial.SerialException:
                 gtk_helper.GtkGladeHelper.show_error_msg("Selected device can not be found or can not be configured.", self._window)
                 self.__btn_connect.set_active(False)
+                self.__close_port()
                 self.__refresh_ports()
                 return
 
             def gen():
                 try:
-                    while self.__serial.readable():
+                    while self.__serial.is_open and self.__serial.readable():
                         yield self.__serial.readline().decode("utf-8")
                 except serial.SerialException:
-                    yield "Selected device can not be found or can not be configured.\n"
                     self.__btn_connect.set_active(False)
                     self.__refresh_ports()
 
@@ -154,35 +147,13 @@ class MainWindow(BaseWindow):
             self.__refresh_text_view_task.start()
         else:
             self.__refresh_text_view_task.stop()
-            self.__serial.close()
+            self.__close_port()
 
         self.__refresh_connect_controls_state()
 
-    def reading_serial(self):
-        #pass
-        # while self.__serial.is_open and self.__serial.readable():
-        #     self.__serial_message_queue.put(self.__serial.readline())
-        for x in range(100):
-            time.sleep(0.2)
-            self.__append(str(x)+'\r\n')
-            yield True
-            # self.__serial_message_queue.put(str(x))
-    
     def run_gen(self, function):
         gen = function()
         GLib.idle_add(lambda: next(gen, False), priority=GLib.PRIORITY_LOW)
-
-    def __check_serial_message_queue(self):
-        if self.__reading_thread.is_alive():
-            try:
-                serial_message = self.__serial_message_queue.get()
-                GLib.idle_add(self.__append, serial_message)
-                print(serial_message)
-            except queue.Empty:
-                pass
-            return True # to keep timeout running
-        else:
-            return False # to end timeout
 
     def __append(self, *args):
         try:
@@ -220,16 +191,14 @@ class MainWindow(BaseWindow):
 
         return result
 
-    def __stop_reading_thread(self):
-        if not self.__reading_thread is None and self.__reading_thread.is_alive:
-            self.__reading_thread.join()
-
     def __close_port(self):
         if self.__serial.is_open:
             self.__serial.close()
     
     def __quit(self):
-        self.__stop_reading_thread()
+        if self.__refresh_text_view_task is not None:
+            self.__refresh_text_view_task.stop();
+
         self.__close_port()
         Gtk.main_quit()
 

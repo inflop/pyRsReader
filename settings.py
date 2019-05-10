@@ -8,7 +8,7 @@ from main import APP_NAME
 
 
 class Settings:
-    __config_path = "".join([os.path.expanduser("~/."), APP_NAME, ".cfg"])
+    __config_path = "".join([os.path.expanduser("~/."), APP_NAME, ".ini"])
     __main_section = "Main"
     __port_option_name = "port"
     __baudrate_option_name = "baudrate"

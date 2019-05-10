@@ -12,12 +12,11 @@ class GeneratorTask(object):
         self.loop_callback = loop_callback
         self.complete_callback = complete_callback
         self._stopped = False
-        self.thread = None
+        self.__thread = None
 
     def _start(self, *args, **kwargs):
         self._stopped = False
         for ret in self.generator(*args, **kwargs):
-            print(ret)
             if self._stopped:
                 _thread.exit()
             GLib.idle_add(self._loop, ret)
@@ -32,11 +31,9 @@ class GeneratorTask(object):
         self.loop_callback(*ret)
 
     def start(self, *args, **kwargs):
-        self.thread = threading.Thread(target=self._start, args=args, kwargs=kwargs)
-        self.thread.daemon = True
-        self.thread.start()
+        self.__thread = threading.Thread(target=self._start, args=args, kwargs=kwargs)
+        self.__thread.daemon = True
+        self.__thread.start()
 
     def stop(self):
         self._stopped = True
-        if self.thread is not None and self.thread.is_alive:
-            self.thread.join()
