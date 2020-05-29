@@ -7,7 +7,6 @@ import serial_helper
 from base_window import BaseWindow
 from main import APP_NAME
 
-GObject.threads_init()
 
 class PortInfoWindow(BaseWindow):
     def __init__(self, parent_window):

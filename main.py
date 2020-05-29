@@ -20,9 +20,6 @@ import gtk_helper
 import serial_helper
 import main_window
 
-GLib.threads_init()     # ?
-GObject.threads_init()  # YES!
-#Gdk.threads_init() # deprecated
 
 if __name__ == "__main__":
     if len(serial_helper.SerialHelper.get_available_ports()) == 0:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 from gi.repository import Gtk, GObject, GLib
 import serial
 import gtk_helper
@@ -13,8 +12,6 @@ import about_window
 import settings
 from main import APP_NAME
 from base_window import BaseWindow
-
-GObject.threads_init()
 
 
 class MainWindow(BaseWindow):
